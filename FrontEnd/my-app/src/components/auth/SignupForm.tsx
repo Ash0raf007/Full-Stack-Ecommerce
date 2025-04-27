@@ -5,6 +5,8 @@ import Button from "../Button";
 import Input from "../Input";
 import { signUpAction } from "../../../action/auth/SignUp";
 import { toast } from "react-toastify";
+import { signUpSchema } from "@/lib/validation/signUpSchema ";
+import { z } from "zod";
 
 const SignupForm = () => {
   const [error, setError] = useState<string | null>(null);
@@ -25,11 +27,25 @@ const SignupForm = () => {
     }));
   };   
 
+
+
   const handleSubmit = async (e: React.FormEvent) => {
 setError("")
 setSucess("")
     e.preventDefault();
-    console.log(formData); // send to API or validation
+
+// zod validation logic
+    try {
+          signUpSchema.parse(formData); 
+        } catch (err) {
+          if (err instanceof z.ZodError) {
+            setError(err.errors[0].message);
+            return;
+          }
+        }
+    // ///////////////////////////
+        console.log(formData); 
+
 
     const res= await signUpAction(formData)
  console.log(res,"test")
@@ -55,7 +71,6 @@ setSucess("")
             value={formData.first_name}
             onChange={handleChange}
             placeholder="Enter your first name"
-            required
           />
           <Input
             label="Last Name"

@@ -5,9 +5,12 @@ import Input from "../Input";
 import { signInAction } from "../../../action/auth/SignIn";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { z } from "zod";
+import { signinSchema } from "@/lib/validation/signinSchema";
+
 const SigninForm = () => {
-    const [error, setError] = useState<string | null>(null);
-    const [sucess, setSucess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [sucess, setSucess] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -24,33 +27,39 @@ const SigninForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-setError("")
-setSucess("")
-    console.log(formData); // send to API or validation
+    setError("");
+    setSucess("");
 
-    const res= await signInAction(formData)
- console.log(res,"test")
+    try {
+      signinSchema.parse(formData); 
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setError(err.errors[0].message);
+        return;
+      }
+    }
+
+    console.log(formData); 
+
+    const res = await signInAction(formData);
+    console.log(res, "test");
     if (res.error) {
       toast.error(res.error);
       return;
     }
-    console.log(res.redirectPath,"redirectPath")
-    toast.success(res.message || "Sign successful!")
+    console.log(res.redirectPath, "redirectPath");
+    toast.success(res.message || "Sign successful!");
     if (res.redirectPath) {
       router.push(res.redirectPath);
     } else {
       router.push("/");
     }
-
   };
 
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4">Login</h1>
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-md w-96"
-      >
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-96">
         <div className="mb-4">
           <Input
             label="Email"
