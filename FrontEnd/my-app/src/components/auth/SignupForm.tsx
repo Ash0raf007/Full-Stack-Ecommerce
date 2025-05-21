@@ -11,6 +11,7 @@ import { z } from "zod";
 const SignupForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [sucess, setSucess] = useState<string | null>(null);
+  const[show,setShow]=useState<boolean>(false)
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -88,14 +89,24 @@ setSucess("")
             onChange={handleChange}
             placeholder="Enter your email"
           />
-          <Input
-            label="Password"
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Enter your password"
-          />
+<div className="relative w-full">
+  <Input
+    label="Password"
+    type={show ? "text" : "password"}
+    name="password"
+    value={formData.password}
+    onChange={handleChange}
+    placeholder="Enter your password"
+  />
+  <button
+    type="button"
+    onClick={() => setShow(prev => !prev)}
+    className="absolute right-3 top-13 cursor-pointer transform -translate-y-1/2 text-sm text-blue-500"
+  >
+    {show ? "Hide" : "Show"}
+  </button>
+</div>
+
         </div>
         <Button
           name="Sign Up"
